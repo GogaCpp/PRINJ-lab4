@@ -1,6 +1,6 @@
 from fastapi.security import OAuth2PasswordBearer
 from datetime import timedelta
-from pydantic import ConfigDict
+from pydantic import ConfigDict, Field
 from pydantic_settings import BaseSettings
 
 
@@ -27,6 +27,15 @@ class Settings(BaseSettings):
     def access_token_expire(self):
         return timedelta(minutes=self.ACCESS_TOKEN_EXPIRE_MINUTES)
 
+    mongo_user: str = Field(alias="MONGO_USER")
+    mongo_password: str = Field(alias="MONGO_PASSWORD")
+    mongo_db: str = Field(alias="MONGO_DB")
+    mongo_host: str = Field(alias="MONGO_HOST")
+    mongo_port: int = Field(alias="MONGO_PORT")
+
+    @property
+    def mongo_url(self):
+        return f"mongodb://{self.mongo_user}:{self.mongo_password}@{self.mongo_host}:{self.mongo_port}/"
 
 settings = Settings(
     _env_file="./user/.env",

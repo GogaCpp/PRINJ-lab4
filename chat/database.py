@@ -2,6 +2,7 @@ from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from pymongo import AsyncMongoClient
 
 from .config import settings
 
@@ -16,3 +17,12 @@ sessionmaker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with sessionmaker() as session:
         yield session
+
+
+async def get_mongo_client():
+    client = AsyncMongoClient(settings.mongo_url)
+    try:
+        await client.aconnect()
+        yield client
+    finally:
+        await client.aclose()

@@ -7,3 +7,4 @@ python-multipart~=0.0.19
 SQLAlchemy~=2.0.38
 asyncpg~=0.30.0
 alembic~=1.15.1
+pymongo~=4.11.1
