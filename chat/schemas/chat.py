@@ -4,7 +4,6 @@ from pydantic import BaseModel, ConfigDict
 
 
 class Chat(BaseModel):
-    id: uuid.UUID
     name: str
     is_group: bool
     creator_id: uuid.UUID
@@ -23,7 +22,6 @@ class ChatUpdatePayload(BaseModel):
 class BaseChat(BaseModel):
     model_config = ConfigDict(from_attributes=True, strict=True)
 
-    id: uuid.UUID
     name: str
     is_group: bool
     creator_id: uuid.UUID
@@ -32,4 +30,4 @@ class BaseChat(BaseModel):
 class BaseChatList(BaseModel):
     model_config = ConfigDict(from_attributes=True, strict=True)
 
-    chat_list: list[BaseChat]
+    chat_list: list[BaseChat] 

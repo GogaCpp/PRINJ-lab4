@@ -1,46 +1,46 @@
-import uuid
 from fastapi import APIRouter, Depends, status
 
-from ..services.chat import ChatService
-from ..schemas.chat import BaseChat, BaseChatList, ChatCreatePayload
+# from ..services.chat import ChatService
+from ..services.chat_mongo import ChatMongoService
+from ..schemas.chat import BaseChat, ChatCreatePayload
 from ..config import oauth2_scheme
 from ..services.jwt import decode_token
 
 router = APIRouter(prefix="/chat")
 
 
-@router.get("/", response_model=BaseChatList)
+@router.get("/")
 async def get_list(
     token: str = Depends(oauth2_scheme),
-    chat_service: ChatService = Depends()
+    chat_mongo_service: ChatMongoService = Depends()
 ):
-    return await chat_service.get_chat_list()
+    return await chat_mongo_service.get_chat_list()
 
 
-@router.get("/{chat_id}", response_model=BaseChat)
+@router.get("/{name}", response_model=BaseChat)
 async def get_chat(
-    chat_id: uuid.UUID,
+    name: str,
     token: str = Depends(oauth2_scheme),
-    chat_service: ChatService = Depends()
+    chat_mongo_service: ChatMongoService = Depends()
 ):
-    return await chat_service.get_chat_by_id(chat_id)
+    return await chat_mongo_service.get_by_name(name)
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=BaseChat)
 async def create_chat(
     chat: ChatCreatePayload,
     token: str = Depends(oauth2_scheme),
-    chat_service: ChatService = Depends(),
+    chat_mongo_service: ChatMongoService = Depends(),
 ):
     d_t = await decode_token(token)
     user_id = d_t["sub"]
-    return await chat_service.create_chat(chat, user_id)
+    return await chat_mongo_service.create(chat, user_id)
 
 
-@router.delete("/{chat_id}")
+@router.delete("/{name}")
 async def delete_chat(
-    chat_id: uuid.UUID,
+    name: str,
     token: str = Depends(oauth2_scheme),
-    chat_service: ChatService = Depends()
+    chat_mongo_service: ChatMongoService = Depends()
 ):
-    return await chat_service.delete_chat(chat_id)
+    return await chat_mongo_service.delete(name)

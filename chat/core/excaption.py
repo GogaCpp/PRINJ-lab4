@@ -1,6 +1,6 @@
 class MongoNotFoundError(Exception):
     def __init__(self, target_id):
-        self.msg = f"Object with ID {target_id} not found"
+        self.msg = f"Object with name {target_id} not found"
         super().__init__(self.msg)
 
 
