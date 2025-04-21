@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: test
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./user/scripts:/docker-entrypoint-initdb.d/user
+      - ./chat/scripts:/docker-entrypoint-initdb.d/chat
+    networks:
+      - mynet
+
+  chat-service:
+    container_name: chat-service
+    build:
+      context: .
+      dockerfile: chat/Dockerfile
+    ports:
+      - "8002:8000"
+    depends_on:
+      - postgres
+    networks:
+      - mynet
+
+  user-service:
+    container_name: user-service
+    build:
+      context: .
+      dockerfile: user/Dockerfile
+    ports:
+      - "8001:8000"
+    depends_on:
+      - postgres
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
+
+volumes:
+  postgres_data:
