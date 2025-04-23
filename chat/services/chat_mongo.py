@@ -23,26 +23,11 @@ class ChatMongoService:
 
     def __init__(
         self,
-        mongo_client: AsyncMongoClient = Depends(get_mongo_client),
+        mongo_client: AsyncMongoClient = Depends(get_mongo_client)
     ):
         self._mongo_db = mongo_client[settings.mongo_db]
         self._collection = self._mongo_db[self.COLLECTION_NAME]
 
-    # def ping_mongo(timeout: float = 3) -> Callable:
-    #     def wrapper(func: Callable) -> Callable:
-    #         @wraps(func)
-    #         async def wrapped(self: 'ChatMongoService', *args, **kwargs) -> Any:
-    #             try:
-    #                 await asyncio.wait_for(self._mongo_db.command('ping'), timeout=timeout)
-    #                 return await func(self, *args, **kwargs)
-    #             except ConnectionFailure:
-    #                 raise MongoConnectionError
-    #             except asyncio.TimeoutError:
-    #                 raise MongoConnectionError("Timeout while trying to ping MongoDB.")
-    #         return wrapped
-    #     return wrapper
-
-    # @ping_mongo()
     async def create(self, data: ChatCreatePayload, user_id: uuid.UUID) -> dict:
         dict_data = data.model_dump()
         dict_data["creator_id"] = user_id
@@ -53,7 +38,6 @@ class ChatMongoService:
         created_document["creator_id"] = uuid.UUID(created_document["creator_id"])
         return created_document
 
-    # @ping_mongo()
     async def get_by_name(self, name: str) -> dict:
         result = await self._collection.find_one(
             {"name": name}
@@ -62,7 +46,6 @@ class ChatMongoService:
             raise MongoNotFoundError(name)
         return result
 
-    # @ping_mongo()
     async def get_chat_list(self):
         chats = self._collection.find()
         objs = []
@@ -76,7 +59,6 @@ class ChatMongoService:
         print(objs)
         return objs
 
-    # @ping_mongo()
     async def update(self, target_id: str, new_data: ChatUpdatePayload) -> dict:
         Chat_for_update = await self.get_by_name(target_id)
         dict_data = new_data.model_dump()
@@ -94,7 +76,6 @@ class ChatMongoService:
             raise MongoUpdateError(target_id)
         return updated_document
 
-    # @ping_mongo()
     async def delete(self, name: str) -> None:
         result = await self._collection.delete_many(
             {"name": name}

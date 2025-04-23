@@ -1,13 +1,22 @@
 import asyncio
+import uuid
 
-from ..models.chat import Chat
-
-from ..database import Base, engine
+from chat.database import get_mongo_client
+from chat.schemas.chat import ChatCreatePayload
+from chat.services.chat_mongo import ChatMongoService
 
 
 if __name__ == "__main__":
-    async def create_all() -> None:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
+    async def create_all(
+    ) -> None:
+        mongo_client = await get_mongo_client()
+
+        chat_serv = ChatMongoService(mongo_client=mongo_client)
+        chat_serv.create(
+            ChatCreatePayload(
+                name="Prinj",
+                is_group=True
+            ),
+            uuid.uuid1()
+        )
     asyncio.run(create_all())
